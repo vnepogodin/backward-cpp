@@ -47,16 +47,16 @@
 // You can define one of the following (or leave it to the auto-detection):
 //
 // #define BACKWARD_SYSTEM_LINUX
-//	- specialization for linux
+//  - specialization for linux
 //
 // #define BACKWARD_SYSTEM_DARWIN
-//	- specialization for Mac OS X 10.5 and later.
+//  - specialization for Mac OS X 10.5 and later.
 //
 // #define BACKWARD_SYSTEM_WINDOWS
 //  - specialization for Windows (Clang 9 and MSVC2017)
 //
 // #define BACKWARD_SYSTEM_UNKNOWN
-//	- placebo implementation, does nothing.
+//  - placebo implementation, does nothing.
 //
 #if defined(BACKWARD_SYSTEM_LINUX)
 #elif defined(BACKWARD_SYSTEM_DARWIN)
@@ -202,8 +202,8 @@
 #include <cxxabi.h>
 #include <fcntl.h>
 #ifdef __ANDROID__
-//		Old Android API levels define _Unwind_Ptr in both link.h and
-// unwind.h 		Rename the one in link.h as we are not going to be using
+//      Old Android API levels define _Unwind_Ptr in both link.h and
+// unwind.h         Rename the one in link.h as we are not going to be using
 // it
 #define _Unwind_Ptr _Unwind_Ptr_Custom
 #include <link.h>
@@ -1379,14 +1379,14 @@ public:
 
     // Now we get in symbol_info:
     // .dli_fname:
-    //		pathname of the shared object that contains the address.
+    //      pathname of the shared object that contains the address.
     // .dli_fbase:
-    //		where the object is loaded in memory.
+    //      where the object is loaded in memory.
     // .dli_sname:
-    //		the name of the nearest symbol to trace.addr, we expect a
-    //		function name.
+    //      the name of the nearest symbol to trace.addr, we expect a
+    //      function name.
     // .dli_saddr:
-    //		the exact address corresponding to .dli_sname.
+    //      the exact address corresponding to .dli_sname.
 
     if (symbol_info.dli_sname) {
       trace.object_function = demangle(symbol_info.dli_sname);
@@ -1504,47 +1504,47 @@ public:
       trace.inliners = backtrace_inliners(fobj, *details_selected);
 
 #if 0
-			if (trace.inliners.size() == 0) {
-				// Maybe the trace was not inlined... or maybe it was and we
-				// are lacking the debug information. Let's try to make the
-				// world better and see if we can get the line number of the
-				// function (trace.source.function) now.
-				//
-				// We will get the location of where the function start (to be
-				// exact: the first instruction that really start the
-				// function), not where the name of the function is defined.
-				// This can be quite far away from the name of the function
-				// btw.
-				//
-				// If the source of the function is the same as the source of
-				// the trace, we cannot say if the trace was really inlined or
-				// not.  However, if the filename of the source is different
-				// between the function and the trace... we can declare it as
-				// an inliner.  This is not 100% accurate, but better than
-				// nothing.
+            if (trace.inliners.size() == 0) {
+                // Maybe the trace was not inlined... or maybe it was and we
+                // are lacking the debug information. Let's try to make the
+                // world better and see if we can get the line number of the
+                // function (trace.source.function) now.
+                //
+                // We will get the location of where the function start (to be
+                // exact: the first instruction that really start the
+                // function), not where the name of the function is defined.
+                // This can be quite far away from the name of the function
+                // btw.
+                //
+                // If the source of the function is the same as the source of
+                // the trace, we cannot say if the trace was really inlined or
+                // not.  However, if the filename of the source is different
+                // between the function and the trace... we can declare it as
+                // an inliner.  This is not 100% accurate, but better than
+                // nothing.
 
-				if (symbol_info.dli_saddr) {
-					find_sym_result details = find_symbol_details(fobj,
-							symbol_info.dli_saddr,
-							symbol_info.dli_fbase);
+                if (symbol_info.dli_saddr) {
+                    find_sym_result details = find_symbol_details(fobj,
+                            symbol_info.dli_saddr,
+                            symbol_info.dli_fbase);
 
-					if (details.found) {
-						ResolvedTrace::SourceLoc diy_inliner;
-						diy_inliner.line = details.line;
-						if (details.filename) {
-							diy_inliner.filename = details.filename;
-						}
-						if (details.funcname) {
-							diy_inliner.function = demangle(details.funcname);
-						} else {
-							diy_inliner.function = trace.source.function;
-						}
-						if (diy_inliner != trace.source) {
-							trace.inliners.push_back(diy_inliner);
-						}
-					}
-				}
-			}
+                    if (details.found) {
+                        ResolvedTrace::SourceLoc diy_inliner;
+                        diy_inliner.line = details.line;
+                        if (details.filename) {
+                            diy_inliner.filename = details.filename;
+                        }
+                        if (details.funcname) {
+                            diy_inliner.function = demangle(details.funcname);
+                        } else {
+                            diy_inliner.function = trace.source.function;
+                        }
+                        if (diy_inliner != trace.source) {
+                            trace.inliners.push_back(diy_inliner);
+                        }
+                    }
+                }
+            }
 #endif
     }
 
@@ -1912,8 +1912,8 @@ public:
       int line = 0, col = 0;
       dwarf_lineno(srcloc, &line);
       dwarf_linecol(srcloc, &col);
-      trace.source.line = line;
-      trace.source.col = col;
+      trace.source.line = static_cast<unsigned>(line);
+      trace.source.col = static_cast<unsigned>(col);
     }
 
     deep_first_search_by_pc(cudie, trace_addr - mod_bias,
@@ -1960,8 +1960,8 @@ private:
         Dwarf_Word line = 0, col = 0;
         dwarf_formudata(dwarf_attr(die, DW_AT_call_line, &attr_mem), &line);
         dwarf_formudata(dwarf_attr(die, DW_AT_call_column, &attr_mem), &col);
-        sloc.line = (unsigned)line;
-        sloc.col = (unsigned)col;
+        sloc.line = static_cast<unsigned>(line);
+        sloc.col = static_cast<unsigned>(col);
 
         trace.inliners.push_back(sloc);
         break;
@@ -3347,7 +3347,7 @@ private:
       if (dwarf_srcfiles(cu_die, &srcfiles, &file_count, &error) == DW_DLV_OK) {
         if (file_count > 0 && file_index <= static_cast<Dwarf_Unsigned>(file_count)) {
           file = std::string(srcfiles[file_index - 1]);
-	}
+    }
 
         // Deallocate all strings!
         for (int i = 0; i < file_count; ++i) {
@@ -3717,9 +3717,9 @@ public:
   lines_t &get_lines(unsigned line_start, unsigned line_count, lines_t &lines) {
     using namespace std;
     // This function make uses of the dumbest algo ever:
-    //	1) seek(0)
-    //	2) read lines one by one and discard until line_start
-    //	3) read line one by one until line_start + line_count
+    //  1) seek(0)
+    //  2) read lines one by one and discard until line_start
+    //  3) read line one by one until line_start + line_count
     //
     // If you are getting snippets many time from the same file, it is
     // somewhat a waste of CPU, feel free to benchmark and propose a
