@@ -1224,7 +1224,7 @@ class TraceResolverImplBase {
 public:
   virtual ~TraceResolverImplBase() {}
 
-  virtual void load_addresses(void *const*addresses, int address_count) {
+  virtual void load_addresses(void *const*addresses, int address_count) final {
     (void)addresses;
     (void)address_count;
   }
