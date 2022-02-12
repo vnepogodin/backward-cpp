@@ -1780,7 +1780,7 @@ public:
   ResolvedTrace resolve(ResolvedTrace trace) override {
     using namespace details;
 
-    Dwarf_Addr trace_addr = (Dwarf_Addr)trace.addr;
+    Dwarf_Addr trace_addr = reinterpret_cast<Dwarf_Addr>(trace.addr);
 
     if (!_dwfl_handle_initialized) {
       // initialize dwfl...
@@ -3484,7 +3484,7 @@ template <>
 class TraceResolverDarwinImpl<trace_resolver_tag::backtrace_symbol>
     : public TraceResolverImplBase {
 public:
-  void load_addresses(void *const*addresses, int address_count) override {
+  final void load_addresses(void *const*addresses, int address_count) override {
     if (address_count == 0) {
       return;
     }
